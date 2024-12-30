@@ -6,7 +6,7 @@ module ALU (
     output reg zero
     );
 
-  
+
     //Different ALU operations
     parameter[3:0] ALUOP_AND = 4'b0000;
     parameter[3:0] ALUOP_OR = 4'b0001;
@@ -17,8 +17,8 @@ module ALU (
     parameter[3:0] ALUOP_LOG_SHIFT_R = 4'b1001;
     parameter[3:0] ALUOP_NUM_SHIFT_R = 4'b1010;
     parameter[3:0] ALUOP_XOR = 4'b0101;
-  
-  
+
+
     always @(*) begin
         result = 0;
         case (alu_op)
@@ -38,5 +38,3 @@ module ALU (
     end
 
 endmodule
-  
-  

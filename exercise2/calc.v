@@ -1,5 +1,5 @@
 `include "../exercise1/alu.v"
-`include  "calc_enc.v"
+`include "calc_enc.v"
 
 module calc (
     input clk,
@@ -36,12 +36,11 @@ module calc (
 
     always @(btnd or posedge clk or btnu) begin 
     if (btnu) begin
-        accumulator = 16'b0;         // Reset accumulator
+        accumulator <= 16'b0;         // Reset accumulator
     end else if (btnd) begin
-        accumulator = alu_result[15:0]; 
+        accumulator <= alu_result[15:0]; 
         // Update LED output
         led <= accumulator;              
     end
 
-    
 endmodule

@@ -11,7 +11,7 @@ module calc (
     input signed [15:0] sw,
     output reg [15:0] led
 );
-    reg [15:0] accumulator;
+    reg signed [15:0] accumulator;
 
     reg signed [31:0] signal_op1,signal_op2;
     wire [31:0] alu_result;

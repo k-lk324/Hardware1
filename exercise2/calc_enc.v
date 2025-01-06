@@ -5,15 +5,19 @@ module calc_enc (
     output [3:0] alu_op
 );
 
-    wire a00, a01, 
+    // Intermediate wires for alu_op[0]
+    wire a00, a01;
     wire n0;
 
+    // Intermediate wires for alu_op[1]
     wire a10, a11;
     wire n10, n11;
 
+    // Intermediate wires for alu_op[2]
     wire a20, a21, a22;
     wire n20, n21;
 
+    // Intermediate wires for alu_op[3]
     wire a30, a31, a32, a33;
     wire n30, n31;
 
@@ -36,7 +40,7 @@ module calc_enc (
     not (n21, btnr);
     and (a21, n20, btnl);
     and (a22, a21, n21);
-    or (alu_op[2], a21, a22);
+    or (alu_op[2], a20, a22);
 
     // alu_op[3]
     not (n30, btnc);
@@ -45,5 +49,6 @@ module calc_enc (
     not (n31, btnr);
     and (a32, a30, btnr);
     and (a33, a31, n31);
+    or (alu_op[3], a32, a33);
 
 endmodule

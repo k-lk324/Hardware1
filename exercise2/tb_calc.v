@@ -1,102 +1,104 @@
 `timescale 1ns / 1ps
-module tb_calc
 
+module tb_calc;
 
-    // Inputs
-    reg [3:0] switches;       // Switch inputs
-    reg [15:0] prev_value;    // Previous value (accumulator)
-    reg btnl, btnc, btnr;     // Button inputs
+    // Inputs for calc
+    reg clk;
+    reg btnc, btnl, btnu, btnr, btnd;
+    reg signed [15:0] sw;
 
-    // Output
-    wire [15:0] result;       // ALU result output
+    // Output from calc
+    wire [15:0] led;
 
-    // Instantiate the Unit Under Test (UUT)
-    alu uut (
-        .switches(switches),
-        .prev_value(prev_value),
-        .btnl(btnl),
+    // Instantiate calc module
+    calc uut (
+        .clk(clk),
         .btnc(btnc),
+        .btnl(btnl),
+        .btnu(btnu),
         .btnr(btnr),
-        .result(result)
+        .btnd(btnd),
+        .sw(sw),
+        .led(led)
     );
 
-    // Test procedure
+    // Clock generation
+    always #5 clk = ~clk;
+
     initial begin
-        // Reset signal
-        btnl = 0; btnc = 1; btnr = 0; // Reset condition
-        prev_value = 16'hxxxx;        // Undefined previous value
-        switches = 16'hxxxx;         // Undefined switches
-        #10;                         // Wait for reset
-        if (result != 16'h0000) $display("Test Failed: Reset");
-        
-        // Test Case 1: ADD
-        btnl = 0; btnc = 1; btnr = 0; // ADD operation
-        prev_value = 16'h0000;
-        switches = 16'h354a;
+        // Initialize inputs
+        clk = 0;
+        btnc = 0; btnl = 0; btnu = 0; btnr = 0; btnd = 0;
+        sw = 16'h0000;
+
+        // Reset test
+        btnu = 1; // Simulate reset
         #10;
-        if (result != 16'h354a) $display("Test Failed: ADD");
+        btnu = 0; // Release reset
+        if (led != 16'h0000) $display("Test Failed: Reset");
+
+        // Test Case 1: ADD
+        sw = 16'h354a;       // Set switches to 0x354a
+        btnc = 1; btnl = 0; btnr = 0; // ADD operation
+        #10;
+        btnc = 0;
+        if (led != 16'h354a) $display("Test Failed: ADD");
 
         // Test Case 2: SUB
-        btnl = 0; btnc = 1; btnr = 1; // SUB operation
-        prev_value = 16'h354a;
-        switches = 16'h1234;
+        sw = 16'h1234;       // Set switches to 0x1234
+        btnc = 1; btnl = 0; btnr = 1; // SUB operation
         #10;
-        if (result != 16'h2316) $display("Test Failed: SUB");
+        btnc = 0;
+        if (led != 16'h2316) $display("Test Failed: SUB");
 
         // Test Case 3: OR
-        btnl = 0; btnc = 0; btnr = 1; // OR operation
-        prev_value = 16'h2316;
-        switches = 16'h1001;
+        sw = 16'h1001;       // Set switches to 0x1001
+        btnc = 0; btnl = 0; btnr = 1; // OR operation
         #10;
-        if (result != 16'h3317) $display("Test Failed: OR");
+        if (led != 16'h3317) $display("Test Failed: OR");
 
         // Test Case 4: AND
-        btnl = 0; btnc = 0; btnr = 0; // AND operation
-        prev_value = 16'h3317;
-        switches = 16'h0f0f;
+        sw = 16'h0f0f;       // Set switches to 0x0f0f
+        btnc = 0; btnl = 0; btnr = 0; // AND operation
         #10;
-        if (result != 16'h3010) $display("Test Failed: AND");
+        if (led != 16'h3010) $display("Test Failed: AND");
 
         // Test Case 5: XOR
-        btnl = 1; btnc = 1; btnr = 1; // XOR operation
-        prev_value = 16'h3010;
-        switches = 16'h1fa2;
+        sw = 16'h1fa2;       // Set switches to 0x1fa2
+        btnc = 1; btnl = 1; btnr = 1; // XOR operation
         #10;
-        if (result != 16'h2fb2) $display("Test Failed: XOR");
+        btnc = 0;
+        if (led != 16'h2fb2) $display("Test Failed: XOR");
 
         // Test Case 6: ADD
-        btnl = 0; btnc = 1; btnr = 0; // ADD operation
-        prev_value = 16'h2fb2;
-        switches = 16'h6aa2;
+        sw = 16'h6aa2;       // Set switches to 0x6aa2
+        btnc = 1; btnl = 0; btnr = 0; // ADD operation
         #10;
-        if (result != 16'h9a54) $display("Test Failed: ADD");
+        btnc = 0;
+        if (led != 16'h9a54) $display("Test Failed: ADD");
 
         // Test Case 7: Logical Shift Left
-        btnl = 0; btnc = 1; btnr = 1; // Logical Shift Left operation
-        prev_value = 16'h9a54;
-        switches = 16'h0004;
+        sw = 16'h0004;       // Set switches to 0x0004
+        btnc = 0; btnl = 1; btnr = 1; // Logical Shift Left operation
         #10;
-        if (result != 16'h0540) $display("Test Failed: Logical Shift Left");
+        if (led != 16'h0540) $display("Test Failed: Logical Shift Left");
 
         // Test Case 8: Shift Right Arithmetic
-        btnl = 0; btnc = 0; btnr = 0; // Shift Right Arithmetic operation
-        prev_value = 16'h0540;
-        switches = 16'h0001;
+        sw = 16'h0001;       // Set switches to 0x0001
+        btnc = 0; btnl = 0; btnr = 0; // Shift Right Arithmetic operation
         #10;
-        if (result != 16'h02a0) $display("Test Failed: Shift Right Arithmetic");
+        if (led != 16'h02a0) $display("Test Failed: Shift Right Arithmetic");
 
         // Test Case 9: Less Than
-        btnl = 1; btnc = 0; btnr = 0; // Less Than operation
-        prev_value = 16'h02a0;
-        switches = 16'h46ff;
+        sw = 16'h46ff;       // Set switches to 0x46ff
+        btnc = 1; btnl = 0; btnr = 0; // Less Than operation
         #10;
-        if (result != 16'h0001) $display("Test Failed: Less Than");
+        btnc = 0;
+        if (led != 16'h0001) $display("Test Failed: Less Than");
 
         // End of test
         $display("All Tests Completed");
         $finish;
     end
-
-
 
 endmodule

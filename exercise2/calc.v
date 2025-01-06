@@ -1,4 +1,4 @@
-`include "../exercise1/alu.v"
+`include "alu.v"
 `include "calc_enc.v"
 
 module calc (
@@ -16,11 +16,13 @@ module calc (
     reg signed [31:0] signal_op1,signal_op2;
     wire [31:0] alu_result;
     wire [3:0] alu_op;
+    wire zero;
 
     alu alu_instance (
         .op1(signal_op1),
         .op2(signal_op2),
         .alu_op(alu_op),
+        .zero(zero),
         .result(alu_result)
     );
 
@@ -34,13 +36,13 @@ module calc (
     assign signal_op1 = {{16{accumulator[15]}}, accumulator};
     assign signal_op2 = {{16{sw[15]}}, sw};
 
-    always @(btnd or posedge clk or btnu) begin 
-    if (btnu) begin
-        accumulator <= 16'b0;         // Reset accumulator
-    end else if (btnd) begin
-        accumulator <= alu_result[15:0]; 
-        // Update LED output
-        led <= accumulator;              
+    always @(posedge clk or btnu) begin 
+        if (btnu) begin
+          accumulator = 16'b0;         // Reset accumulator
+        end
+        else if (btnd) begin
+            accumulator = alu_result[15:0];            
+        end
+        led = accumulator;
     end
-
 endmodule

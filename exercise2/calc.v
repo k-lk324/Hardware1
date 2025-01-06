@@ -1,4 +1,4 @@
-`include  "../exercise1/alu.v"
+`include "../exercise1/alu.v"
 `include  "calc_enc.v"
 
 module calc (
@@ -34,12 +34,13 @@ module calc (
     assign signal_op1 = {{16{accumulator[15]}}, accumulator};
     assign signal_op2 = {{16{sw[15]}}, sw};
 
-    always @( btnd or posedge clk  or btnu) begin 
+    always @(btnd or posedge clk or btnu) begin 
     if (btnu) begin
         accumulator = 16'b0;         // Reset accumulator
     end else if (btnd) begin
         accumulator = alu_result[15:0]; 
-    led <= accumulator;              // Update LED output
+        // Update LED output
+        led <= accumulator;              
     end
 
     

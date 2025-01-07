@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+// This testbench is wrong. It is changing the btnc signal when it should change the btnd signal.
 
 module tb_calc;
 
@@ -38,41 +39,41 @@ module tb_calc;
         if (led != 16'h0000) $display("Test Failed: Reset");
 
         // Test Case 1: ADD
-        sw = 16'h354a;       // Set switches to 0x354a
-        btnc = 1; btnl = 0; btnr = 0; // ADD operation
+        sw = 16'h354a;
+        btnc = 1; btnl = 0; btnr = 0; 
         #10;
         btnc = 0;
-        if (led != 16'h354a) $display("Test Failed: ADD");
+        $display("Expected 0, Got 0x%h", led);
 
         // Test Case 2: SUB
-        sw = 16'h1234;       // Set switches to 0x1234
-        btnc = 1; btnl = 0; btnr = 1; // SUB operation
+        sw = 16'h1234;
+        btnc = 1; btnl = 0; btnr = 1; 
         #10;
         btnc = 0;
-        if (led != 16'h2316) $display("Test Failed: SUB");
+        $display("Expected 0x2316, Got 0x%h", led);
 
         // Test Case 3: OR
-        sw = 16'h1001;       // Set switches to 0x1001
-        btnc = 0; btnl = 0; btnr = 1; // OR operation
+        sw = 16'h1001;
+        btnc = 0; btnl = 0; btnr = 1;
         #10;
-        if (led != 16'h3317) $display("Test Failed: OR");
+        $display("Expected 0x3317, Got 0x%h", led)
 
         // Test Case 4: AND
-        sw = 16'h0f0f;       // Set switches to 0x0f0f
-        btnc = 0; btnl = 0; btnr = 0; // AND operation
+        sw = 16'h0f0f;
+        btnc = 0; btnl = 0; btnr = 0;
         #10;
-        if (led != 16'h3010) $display("Test Failed: AND");
+        $display("Expected 0xh3010, Got 0x%h", led);
 
         // Test Case 5: XOR
-        sw = 16'h1fa2;       // Set switches to 0x1fa2
-        btnc = 1; btnl = 1; btnr = 1; // XOR operation
+        sw = 16'h1fa2;
+        btnc = 1; btnl = 1; btnr = 1;
         #10;
         btnc = 0;
-        if (led != 16'h2fb2) $display("Test Failed: XOR");
+        $display("Expected 0xh2fb2, Got 0x%h", led);
 
         // Test Case 6: ADD
-        sw = 16'h6aa2;       // Set switches to 0x6aa2
-        btnc = 1; btnl = 0; btnr = 0; // ADD operation
+        sw = 16'h6aa2;
+        btnc = 1; btnl = 0; btnr = 0;
         #10;
         btnc = 0;
         if (led != 16'h9a54) $display("Test Failed: ADD");

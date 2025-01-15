@@ -1,6 +1,4 @@
-module regfile #(
-    parameter DATAWIDTH = 32
-)(
+module regfile #(parameter DATAWIDTH = 32)(
     input clk,
     input [4:0] readReg1,
     input [4:0] readReg2,

@@ -14,7 +14,7 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
 );
     wire Zero;
     wire [6:0] opcode;
-
+//change
     reg PCSrc;
     reg ALUSrc;
     reg RegWrite;

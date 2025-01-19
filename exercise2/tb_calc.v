@@ -27,6 +27,9 @@ module tb_calc;
     always #5 clk = ~clk;
 
     initial begin
+        $dumpfile("dump.vcd"); 
+        $dumpvars; 
+
         // Initialize inputs
         clk = 0;
         btnc = 0; btnl = 0; btnu = 0; btnr = 0; btnd = 0;

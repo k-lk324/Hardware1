@@ -12,7 +12,7 @@ module datapath #(parameter INITIAL_PC[31:0] = 32'h00400000)(
     input [3:0] ALUCtrl,
     input loadPC,
     output reg [31:0] PC,
-    output zero,
+    output Zero,
     output reg [31:0] dAddress,
     output reg [31:0] dWriteData,
     input [31:0] dReadData,
@@ -64,7 +64,7 @@ module datapath #(parameter INITIAL_PC[31:0] = 32'h00400000)(
         .op2(ALUSrc ? imm : readData2),
         .alu_op(ALUCtrl),
         .result(aluResult),
-        .zero(zero)
+        .zero(Zero)
     )
 
 

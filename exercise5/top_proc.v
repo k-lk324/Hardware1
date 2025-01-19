@@ -24,6 +24,7 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
     reg MemToReg;
     reg loadPC;
     reg [3:0] ALUCtrl;
+    
 
     datapath #(.INITIAL_PC(INITIAL_PC))datapath(
         .clk(clk),
@@ -87,8 +88,16 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
     localparam [6:0] FUNCT7_SRL = 7'b0000000;
     localparam [6:0] FUNCT7_SRA = 7'b0100000;
 
-
-
+    // ALU Operations
+    localparam [3:0] ALU_AND = 4'b0000;
+    localparam [3:0] ALU_ADD = 4'b0010;
+    localparam [3:0] ALU_SUB = 4'b0110;
+    localparam [3:0] ALU_OR = 4'b0001;
+    localparam [3:0] ALU_XOR = 4'b0101;
+    localparam [3:0] ALU_SLT = 4'b0100;
+    localparam [3:0] ALU_SLL = 4'b1001;
+    localparam [3:0] ALU_SRL = 4'b1000;
+    localparam [3:0] ALU_SRA = 4'b1000;
 
 
 
@@ -108,8 +117,8 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
             case (state)
                 IF: begin
                     // Instruction Fetch
-                    loadPC   <= 0;
-                    MemRead  <= 0;
+                    loadPC <= 0;
+                    MemRead <= 0;
                     MemWrite <= 0;
                     RegWrite <= 0;
                     MemToReg <= 0;
@@ -149,38 +158,78 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
     // ALUSrc
     always @(*) begin
         case (opcode)
-            LW: begin
-                ALUSrc = 1;
-            end
-            SW: begin
-                ALUSrc = 1;
-            end
-            BEQ: begin
-                ALUSrc = 0;
-            end
-            IMMEDIATE: begin
-                ALUSrc = 1;
-            end
-            default: begin
-                ALUSrc = 0;
-            end
+            LW: ALUSrc = 1;
+            SW: ALUSrc = 1;
+            BEQ: ALUSrc = 0;
+            IMMEDIATE: ALUSrc = 1;
+            NON_IMMEDIATE: ALUSrc = 0;
+            default: ALUSrc = 0;
         endcase
     end
 
     // ALUCtrl
     always @(*) begin
+        if (opcode == NON_IMMEDIATE) begin
+            case (funct3)
+                FUNCT3_SLL: ALUCtrl = ALU_SLL;
+                FUNCT3_SLT: ALUCtrl = ALU_SLT;
+                FUNCT3_XOR: ALUCtrl = ALU_XOR;
+                FUNCT3_OR: ALUCtrl = ALU_OR;
+                FUNCT3_AND: ALUCtrl = ALU_AND;
+                // ADD and SUB share the same funct3
+                FUNCT3_ADD: begin
+                    if (funct7 == FUNCT7_ADD)
+                        ALUCtrl = ALU_ADD;
+                    else if (funct7 == FUNCT7_SUB)
+                        ALUCtrl = ALU_SUB;
+                end
+                // SRL and SRA share the same funct3
+                FUNCT3_SRL: begin
+                    if (funct7 == FUNCT7_SRL)
+                        ALUCtrl = ALU_SRL;
+                    else if (funct7 == FUNCT7_SRA)
+                        ALUCtrl = ALU_SRA;
+                end
+                default: ALUCtrl = 4'bxxxx;
+            endcase
+        end
+        else if (opcode == IMMEDIATE) begin
+            case (funct3)
+                FUNCT3_ADDI: ALUCtrl = ALU_ADD;
+                FUNCT3_SLTI: ALUCtrl = ALU_SLT;
+                FUNCT3_XORI: ALUCtrl = ALU_XOR;
+                FUNCT3_ORI: ALUCtrl = ALU_OR;
+                FUNCT3_ANDI: ALUCtrl = ALU_AND;
+                FUNCT3_SLLI: ALUCtrl = ALU_SLL;
+                // SRLI and SRAI share the same funct3
+                FUNCT3_SRLI: begin
+                    if (funct7 == FUNCT7_SRLI)
+                        ALUCtrl = ALU_SRL;
+                    else if (funct7 == FUNCT7_SRAI)
+                        ALUCtrl = ALU_SRA;
+                end
+                default: ALUCtrl = 4'bxxxx;
+            endcase
+        end
+        else begin
         case (opcode)
-            BEQ: begin
-                ALUCtrl = 4'b0110;
-            end
-            IMMEDIATE: begin
-                ALUCtrl = 4'b0010;
-            end
-            default: begin
-                ALUCtrl = 4'b0000;
-            end
+            BEQ: ALUCtrl = ALU_SUB;
+            LW: ALUCtrl = ALU_ADD;
+            SW: ALUCtrl = ALU_ADD;
+            default: ALUCtrl = 4'bxxxx;
         endcase
     end
 
+
+    // PCSrc
+    always @(*) begin
+        // PCSrc
+        if (opcode == BEQ && Zero) begin
+            PCSrc <= 1;
+        end
+        else begin
+            PCSrc <= 0;
+        end
+    end
 
 endmodule

@@ -6,7 +6,6 @@ module alu (
     output reg zero
     );
 
-
     //Different ALU operations
     parameter[3:0] ALUOP_AND = 4'b0000;
     parameter[3:0] ALUOP_OR = 4'b0001;
@@ -20,7 +19,6 @@ module alu (
 
 
     always @(*) begin
-        result = 0;
         case (alu_op)
             ALUOP_AND: result = op1 & op2;
             ALUOP_OR: result = op1 | op2;

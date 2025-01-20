@@ -1,25 +1,27 @@
 `timescale 1ns / 1ps
-// This testbench is wrong. It is changing the btnc signal when it should change the btnd signal.
 
 module tb_calc;
+    // Inputs
+    reg clk = 0;
+    reg btnc = 0;
+    reg btnl = 0;
+    reg btnu = 0;
+    reg btnr = 0;
+    reg btnd = 0;
+    reg [15:0] sw = 0;
 
-    // Inputs for calc
-    reg clk;
-    reg btnc, btnl, btnu, btnr, btnd;
-    reg signed [15:0] sw;
-
-    // Output from calc
+    // Outputs
     wire [15:0] led;
 
-    // Instantiate calc module
+    // Instantiate the Unit Under Test (UUT)
     calc uut (
-        .clk(clk),
-        .btnc(btnc),
-        .btnl(btnl),
-        .btnu(btnu),
-        .btnr(btnr),
-        .btnd(btnd),
-        .sw(sw),
+        .clk(clk), 
+        .btnc(btnc), 
+        .btnl(btnl), 
+        .btnu(btnu), 
+        .btnr(btnr), 
+        .btnd(btnd), 
+        .sw(sw), 
         .led(led)
     );
 
@@ -30,79 +32,94 @@ module tb_calc;
         $dumpfile("dump.vcd"); 
         $dumpvars; 
 
-        // Initialize inputs
-        clk = 0;
-        btnc = 0; btnl = 0; btnu = 0; btnr = 0; btnd = 0;
-        sw = 16'h0000;
-
-        // Reset test
-        btnu = 1; // Simulate reset
+        // Reset the calculator
+        btnu = 1; 
         #10;
-        btnu = 0; // Release reset
-        if (led != 16'h0000) $display("Test Failed: Reset");
+        btnu = 0;
 
-        // Test Case 1: ADD
+        // 1. ADD operation
+        {btnl, btnc, btnr} = 3'b010;
         sw = 16'h354a;
-        btnc = 1; btnl = 0; btnr = 0; 
         #10;
-        btnc = 0;
-        $display("Expected 0, Got 0x%h", led);
-
-        // Test Case 2: SUB
+        btnd = 1;
+        #10;
+        btnd = 0;
+        $display("Expected: 0x354a, Got: 0x%h", led);
+        
+        // 2. SUB operation
+        {btnl, btnc, btnr} = 3'b011;
         sw = 16'h1234;
-        btnc = 1; btnl = 0; btnr = 1; 
         #10;
-        btnc = 0;
-        $display("Expected 0x2316, Got 0x%h", led);
-
-        // Test Case 3: OR
-        sw = 16'h1001;
-        btnc = 0; btnl = 0; btnr = 1;
+        btnd = 1; 
         #10;
-        $display("Expected 0x3317, Got 0x%h", led)
-
-        // Test Case 4: AND
-        sw = 16'h0f0f;
-        btnc = 0; btnl = 0; btnr = 0;
+        btnd = 0;
+        $display("Expected: 0x2316, Got: 0x%h", led);
+        
+        // 3. OR operation
+        {btnl, btnc, btnr} = 3'b001; 
+        sw = 16'h1001; 
         #10;
-        $display("Expected 0xh3010, Got 0x%h", led);
-
-        // Test Case 5: XOR
-        sw = 16'h1fa2;
-        btnc = 1; btnl = 1; btnr = 1;
+        btnd = 1; 
         #10;
-        btnc = 0;
-        $display("Expected 0xh2fb2, Got 0x%h", led);
-
-        // Test Case 6: ADD
-        sw = 16'h6aa2;
-        btnc = 1; btnl = 0; btnr = 0;
+        btnd = 0;
+        $display("Expected: 0x3317, Got: 0x%h", led);
+        
+        // 4. AND operation
+        {btnl, btnc, btnr} = 3'b000; 
+        sw = 16'hf0f0; 
         #10;
-        btnc = 0;
-        if (led != 16'h9a54) $display("Test Failed: ADD");
-
-        // Test Case 7: Logical Shift Left
-        sw = 16'h0004;       // Set switches to 0x0004
-        btnc = 0; btnl = 1; btnr = 1; // Logical Shift Left operation
+        btnd = 1; 
         #10;
-        if (led != 16'h0540) $display("Test Failed: Logical Shift Left");
-
-        // Test Case 8: Shift Right Arithmetic
-        sw = 16'h0001;       // Set switches to 0x0001
-        btnc = 0; btnl = 0; btnr = 0; // Shift Right Arithmetic operation
+        btnd = 0;
+        $display("Expected: 0x3010, Got: 0x%h", led);
+        
+        // 5. XOR operation
+        {btnl, btnc, btnr} = 3'b111;
+        sw = 16'h1fa2; 
         #10;
-        if (led != 16'h02a0) $display("Test Failed: Shift Right Arithmetic");
-
-        // Test Case 9: Less Than
-        sw = 16'h46ff;       // Set switches to 0x46ff
-        btnc = 1; btnl = 0; btnr = 0; // Less Than operation
+        btnd = 1; 
         #10;
-        btnc = 0;
-        if (led != 16'h0001) $display("Test Failed: Less Than");
+        btnd = 0;
+        $display("Expected: 0x2fb2, Got: 0x%h", led);
 
-        // End of test
-        $display("All Tests Completed");
+      	// 6. ADD operation
+        {btnl, btnc, btnr} = 3'b010; 
+        sw = 16'h6aa2; 
+        #10;
+        btnd = 1; 
+        #10;
+        btnd = 0;
+        $display("Expected: 0x9a54, Got: 0x%h", led);
+        
+        // 7. Logical Shift Left operation
+        {btnl, btnc, btnr} = 3'b101; 
+        sw = 16'h0004; 
+        #10;
+        btnd = 1; 
+        #10;
+        btnd = 0;
+        $display("Expected: 0xa540, Got: 0x%h", led);
+        
+        // 8. Arithmetic Shift Right operation
+        {btnl, btnc, btnr} = 3'b110; 
+        sw = 16'h0001; 
+        #10;
+        btnd = 1; 
+        #10;
+        btnd = 0;
+        $display("Expected: 0xd2a0, Got: 0x%h", led);
+        
+        // 9. Less Than operation
+        {btnl, btnc, btnr} = 3'b100;
+        sw = 16'h46ff; 
+        #10;
+        btnd = 1; 
+        #10;
+        btnd = 0;
+        $display("Expected: 0x0001, Got: 0x%h", led);
+        
+        // Finish the simulation
+        #10;
         $finish;
     end
-
 endmodule

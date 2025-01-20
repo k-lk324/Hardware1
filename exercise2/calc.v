@@ -36,7 +36,7 @@ module calc (
     assign signal_op1 = {{16{accumulator[15]}}, accumulator};
     assign signal_op2 = {{16{sw[15]}}, sw};
 
-    always @(posedge clk or btnu) begin 
+    always @(posedge clk) begin 
         if (btnu) begin
           accumulator = 16'b0;         // Reset accumulator
         end

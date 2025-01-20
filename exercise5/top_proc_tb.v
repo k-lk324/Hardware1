@@ -37,25 +37,20 @@ module top_proc_tb;
     );
 
     // Instantiate instruction memory (rom)
-    rom instruction_memory (
+    INSTRUCTION_MEMORY rom (
         .clk(clk),
-        .address(PC[8:0]),
+        .addr(PC[8:0]),
         .dout(instr)
     );
 
     // Instantiate data memory (ram)
-    ram data_memory (
+    DATA_MEMORY ram (
         .clk(clk),
         .we(MemWrite),
         .addr(dAddress[8:0]),
         .din(dWriteData),
         .dout(dReadData)
     );
-
-    // Load instructions into instruction memory
-    initial begin
-        $readmemh("rom_bytes.data", instruction_memory.memory);
-    end
 
 
     initial begin
@@ -70,6 +65,10 @@ module top_proc_tb;
         // Run simulation for a sufficient time to execute all instructions
         #1000;
         $finish;
+    end
+
+    initial begin
+        $monitor("%b", instr);
     end
 
 endmodule

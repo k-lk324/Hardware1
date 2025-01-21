@@ -63,7 +63,7 @@ module top_proc_tb;
         rst = 0;
 
         // Run simulation for a sufficient time to execute all instructions
-        #1000;
+        #1200;
         $finish;
     end
 

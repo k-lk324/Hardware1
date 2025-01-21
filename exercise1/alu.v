@@ -14,7 +14,7 @@ module alu (
     parameter[3:0] ALUOP_LESS = 4'b0100;
     parameter[3:0] ALUOP_LOG_SHIFT_R = 4'b1000;
     parameter[3:0] ALUOP_LOG_SHIFT_L = 4'b1001;
-    parameter[3:0] ALUOP_NUM_SHIFT_R = 4'b1010;
+    parameter[3:0] ALUOP_ARI_SHIFT_R = 4'b1010;
     parameter[3:0] ALUOP_XOR = 4'b0101;
 
 
@@ -27,7 +27,7 @@ module alu (
             ALUOP_LESS: result = ($signed(op1) < $signed(op2)) ? 1 : 0;
             ALUOP_LOG_SHIFT_R: result = op1 >> op2[4:0];
             ALUOP_LOG_SHIFT_L: result = op1 << op2[4:0];
-            ALUOP_NUM_SHIFT_R: result = $unsigned($signed(op1) >>> op2[4:0]);
+            ALUOP_ARI_SHIFT_R: result = $unsigned($signed(op1) >>> op2[4:0]);
             ALUOP_XOR: result = op1 ^ op2;
             default: result = 32'b0;
         endcase

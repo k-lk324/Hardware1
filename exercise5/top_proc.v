@@ -113,6 +113,15 @@ module top_proc #(parameter [31:0] INITIAL_PC = 32'h00400000)(
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             state <= IF;
+            // Reset all control signals
+            loadPC <= 0;
+            MemRead <= 0;
+            MemWrite <= 0;
+            RegWrite <= 0;
+            MemToReg <= 0;
+            PCSrc <= 0;
+            ALUSrc <= 0;
+
         end else begin
             case (state)
                 IF: begin
@@ -124,8 +133,8 @@ module top_proc #(parameter [31:0] INITIAL_PC = 32'h00400000)(
                     MemToReg <= 0;
 
                 end
-                ID, // Instruction Decode
-                EX, // Execute
+                ID:; // Instruction Decode
+                EX:; // Execute
                 MEM: begin
                     // Memory Access
                     if (opcode == LW)
@@ -223,6 +232,7 @@ module top_proc #(parameter [31:0] INITIAL_PC = 32'h00400000)(
 
 
     // PCSrc
-    assign PCSrc = (opcode == BEQ && Zero) ? 1: 0;
+    always @(*)
+        PCSrc = (opcode == BEQ && Zero) ? 1: 0;
 
 endmodule

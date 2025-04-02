@@ -1,6 +1,6 @@
 `include "datapath.v"
 
-module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
+module top_proc #(parameter [31:0] INITIAL_PC = 32'h00400000)(
     input clk,
     input rst,
     input [31:0] instr,
@@ -8,8 +8,8 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
     output reg [31:0] PC,
     output reg [31:0] dAddress,
     output reg [31:0] dWriteData,
-    output MemRead,
-    output MemWrite,
+    output reg MemRead,
+    output reg MemWrite,
     output reg [31:0] WriteBackData
 );
 
@@ -113,6 +113,15 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             state <= IF;
+            // Reset all control signals
+            loadPC <= 0;
+            MemRead <= 0;
+            MemWrite <= 0;
+            RegWrite <= 0;
+            MemToReg <= 0;
+            PCSrc <= 0;
+            ALUSrc <= 0;
+
         end else begin
             case (state)
                 IF: begin
@@ -124,8 +133,8 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
                     MemToReg <= 0;
 
                 end
-                ID: // Instruction Decode
-                EX: // Execute
+                ID:; // Instruction Decode
+                EX:; // Execute
                 MEM: begin
                     // Memory Access
                     if (opcode == LW)
@@ -212,24 +221,18 @@ module top_proc #(parameter INITIAL_PC[31:0] = 32'h00400000)(
             endcase
         end
         else begin
-        case (opcode)
-            BEQ: ALUCtrl = ALU_SUB;
-            LW: ALUCtrl = ALU_ADD;
-            SW: ALUCtrl = ALU_ADD;
-            default: ALUCtrl = 4'bxxxx;
-        endcase
+            case (opcode)
+                BEQ: ALUCtrl = ALU_SUB;
+                LW: ALUCtrl = ALU_ADD;
+                SW: ALUCtrl = ALU_ADD;
+                default: ALUCtrl = 4'bxxxx;
+            endcase
+        end
     end
 
 
     // PCSrc
-    always @(*) begin
-        // PCSrc
-        if (opcode == BEQ && Zero) begin
-            PCSrc <= 1;
-        end
-        else begin
-            PCSrc <= 0;
-        end
-    end
+    always @(*)
+        PCSrc = (opcode == BEQ && Zero) ? 1: 0;
 
 endmodule

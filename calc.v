@@ -35,14 +35,15 @@ module calc (
 
     assign signal_op1 = {{16{accumulator[15]}}, accumulator};
     assign signal_op2 = {{16{sw[15]}}, sw};
+    assign led = accumulator;
 
-    always @(posedge clk or btnu) begin 
+    always @(posedge clk) begin 
         if (btnu) begin
           accumulator = 16'b0;         // Reset accumulator
         end
         else if (btnd) begin
             accumulator = alu_result[15:0];            
         end
-        led = accumulator;
+        
     end
 endmodule

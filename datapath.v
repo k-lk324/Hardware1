@@ -1,7 +1,7 @@
 `include "alu.v"
 `include "regfile.v"
 
-module datapath #(parameter INITIAL_PC[31:0] = 32'h00400000)(
+module datapath #(parameter [31:0] INITIAL_PC = 32'h00400000)(
     input clk,
     input rst, 
     input [31:0] instr,
@@ -54,7 +54,7 @@ module datapath #(parameter INITIAL_PC[31:0] = 32'h00400000)(
         .writeReg(rd),
         .writeData(WriteBackData),
         .write(RegWrite),
-        .readData1(readData2),
+        .readData1(readData1),
         .readData2(readData2)
     );
 
@@ -65,7 +65,7 @@ module datapath #(parameter INITIAL_PC[31:0] = 32'h00400000)(
         .alu_op(ALUCtrl),
         .result(aluResult),
         .zero(Zero)
-    )
+    );
 
 
     // Immediate Generation
